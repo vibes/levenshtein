@@ -1,13 +1,14 @@
 #include "ruby.h"
+#include "string.h"
 
 VALUE levenshtein_distance_string(VALUE self, VALUE rb_o1, VALUE rb_o2, VALUE rb_threshold) {
   int	threshold;
-  int	l1, l2;
+  int	l1, l2, tmp;
   int	*prev_row, *curr_row;
   int	col, row;
   int	curr_row_min, result;
-  int	offset;
-  char	*s1, *s2;
+  int	offset, adjustment;
+  char	*s1, *s2, *tmps;
 
   /* Convert Ruby's s1 to C's s1. */
 
@@ -20,6 +21,22 @@ VALUE levenshtein_distance_string(VALUE self, VALUE rb_o1, VALUE rb_o2, VALUE rb
   rb_o2	= StringValue(rb_o2);
   s2	= RSTRING(rb_o2)->ptr;
   l2	= RSTRING(rb_o2)->len;
+
+  //l1 s1 should be the smaller of the two strings
+  if (l1 > l2) {
+    tmp = l1;
+    tmps = s1;
+    l1 = l2;
+    s1 = s2;
+    l2 = tmp;
+    s2 = tmps;
+  }
+
+  if (strstr(s2, s1) == NULL) {
+    adjustment = 0;
+  } else {
+    adjustment = l1;
+  }
 
   /* Convert Ruby's threshold to C's threshold. */
 
@@ -129,5 +146,5 @@ VALUE levenshtein_distance_string(VALUE self, VALUE rb_o1, VALUE rb_o2, VALUE rb
 
   /* Return the Ruby version of the result. */
 
-  return INT2FIX(result);
+  return INT2FIX(result - adjustment);
 }
