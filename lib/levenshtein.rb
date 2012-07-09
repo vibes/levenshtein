@@ -106,4 +106,21 @@ module Levenshtein
 
     row[-1]
   end
+
+  # fuzzy searching using levenshtein distance. lower score is better
+  # if exact match is found, scores can go into negative.
+  # exact match inside string is good, exact match at beginning of string is best.
+  def self.fuzzy_search s1,s2
+    s1, s2	= s2, s1	if s1.length > s2.length	# s1 is the short one; s2 is the long one.
+    s1.split(/\s/).inject(0) do |memo,part|
+      exact_match = s2.index part
+      addition = if exact_match
+        (exact_match == 0 ? -2 : -1)
+      else
+        (distance part,s2) - (s2.length - part.length)
+      end
+      memo = memo + addition
+    end
+  end
+
 end

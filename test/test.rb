@@ -77,6 +77,13 @@ class TestLevenshteinString < Test::Unit::TestCase
     assert_in_delta(0.6, Levenshtein.normalized_distance("123cd", "xyzcd"), 0.01)
     assert_in_delta(0.625, Levenshtein.normalized_distance("123cd123", "123"), 0.01)
   end
+
+  def test_fuzzy_search
+    assert_equal(3, Levenshtein.fuzzy_search("ab123cd", "asdfasdfasdfabxyzcdasdfasdfasdf"))
+    assert_equal(0, Levenshtein.fuzzy_search("ab123", "abxyz12345"))
+    assert_equal(-2, Levenshtein.fuzzy_search("123cd", "123cd"))
+    assert_equal(-1, Levenshtein.fuzzy_search("123cd", "i123cdi"))
+  end
 end
 
 class TestLevenshteinArray < Test::Unit::TestCase
